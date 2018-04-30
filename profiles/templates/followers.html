@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block title %}
+
+{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-12">
+    <div class="card">
+      <div class="card-body">
+        <h5 class="card-title text-center">My Stalkers</h5>
+      </div>
+      <ul class="list-group list-group-flush">
+        {% for follower in followers %}
+          <li class="list-group-item">{{follower.stalker}}</li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+</div>
+{% endblock %}

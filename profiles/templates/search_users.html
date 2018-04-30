@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block title %}{% endblock %}
+
+{% block content %}
+<div class="row text-center">
+  <div class="col-12">
+    <h1>The people you're trying to stalk...😉</h1>
+    <table class="table">
+      <tbody>
+        {% for person in users %}
+        <tr>
+          <td><a href="{% url 'profile' person.pk %}">{{person}}</a></td>
+            {% if person in prey_list %}
+              <td><a href="{% url 'follow' person.pk %}" class="btn btn-outline-danger">UnStalk</a></td>
+            {% else %}
+              <td><a href="{% url 'follow' person.pk %}" class="btn btn-outline-danger">Stalk</a></td>
+            {% endif %}
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
