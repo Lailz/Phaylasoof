@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.db.models import Q
 from django.contrib.auth.models import User
 from django.contrib import messages
-from .models import Follow, Clue, Favorite
+from .models import Follow, Post, Like
 from django.http import JsonResponse
 
 def profile(request, pk):
@@ -11,8 +11,8 @@ def profile(request, pk):
 
     if request.method == "POST":
         message = request.POST.get("message")
-        Clue.objects.create(user=request.user, message=message)
-        messages.success(request, "New clue generated for your stalkers!")
+        Post.objects.create(user=request.user, message=message)
+        messages.success(request, "New post generated for your followers!")
 
     context = {
         "user": User.objects.get(pk=pk)
@@ -23,10 +23,10 @@ def search_users(request):
     if request.user.is_anonymous:
         return redirect('signin')
 
-    prey_list = []
-    preys = request.user.stalker.all()
-    for prey in preys:
-        prey_list.append(prey.prey)
+    following_list = []
+    followings = request.user.follower.all()
+    for following in followings:
+        following_list.append(following.following)
 
     users = User.objects.none()
 
@@ -36,7 +36,7 @@ def search_users(request):
 
     context = {
         "users":users,
-        "prey_list":prey_list
+        "following_list":following_list
     }
     return render(request, 'search_users.html', context)
 
@@ -44,15 +44,15 @@ def follow(request, pk):
     if request.user.is_anonymous:
         return redirect('signin')
 
-    prey = User.objects.get(pk=pk)
-    stalker = request.user
+    following = User.objects.get(pk=pk)
+    follower = request.user
 
-    follow, created = Follow.objects.get_or_create(stalker=stalker, prey=prey)
+    follow, created = Follow.objects.get_or_create(follower=follower, following=following)
     if created:
-        messages.success(request, "Successfully followed %s!"%(prey))
+        messages.success(request, "Successfully followed %s!"%(following))
     else:
         follow.delete()
-        messages.success(request, "Unfollowed %s!"%(prey))
+        messages.success(request, "Unfollowed %s!"%(following))
 
     return redirect('search-users')
 
@@ -61,7 +61,7 @@ def followers(request, pk):
         return redirect('signin')
 
     user = request.user
-    followers = user.prey.all()
+    followers = user.following.all()
     context = {
         "followers": followers,
     }
@@ -72,7 +72,7 @@ def following(request, pk):
         return redirect('signin')
 
     user = request.user
-    following = user.stalker.all()
+    following = user.follower.all()
     context = {
         "following": following,
     }
@@ -83,38 +83,38 @@ def feed(request):
         return redirect('signin')
 
     user = request.user
-    prey_list = []
-    preys = request.user.stalker.all()
-    for prey in preys:
-        prey_list.append(prey.prey)
+    following_list = []
+    followings = request.user.follower.all()
+    for following in followings:
+        following_list.append(following.following)
 
-    clue_list = Clue.objects.filter(
-        Q(user__in=prey_list)|
+    post_list = Post.objects.filter(
+        Q(user__in=following_list)|
         Q(user=request.user)
         ).distinct()
 
-    # favorite_list = []
+    # like_list = []
     # favorites = user.favorite_set.all()
     # for fav in favorites:
-    #     favorite_list.append(fav.clue)
+    #     favorite_list.append(fav.post)
 
-    favorite_list = user.favorite_set.all().values_list('clue_id', flat=True)
+    like_list = user.like_set.all().values_list('post_id', flat=True)
 
     context = {
-        "feed": clue_list,
-        "favorites":favorite_list,
+        "feed": post_list,
+        "likes":like_list,
     }
     return render(request, 'feed.html', context)
 
-def favorite(request, pk):
-    clue_object = Clue.objects.get(pk=pk)
-    new_favorite, created = Favorite.objects.get_or_create(user=request.user, clue=clue_object)
+def like(request, pk):
+    post_object = Post.objects.get(pk=pk)
+    new_like, created = Like.objects.get_or_create(user=request.user, post=post_object)
 
     if created:
-        action="favorite"
+        action="like"
     else:
-        new_favorite.delete()
-        action="unfavorite"
+        new_like.delete()
+        action="unlike"
 
     response = {
         "action": action,

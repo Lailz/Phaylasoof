@@ -4,11 +4,11 @@ from django.contrib.auth.models import User
 
 class Follow(models.Model):
     # stalker will give me who I'm following
-    stalker = models.ForeignKey(User, related_name="stalker", on_delete=models.CASCADE)
+    follower = models.ForeignKey(User, related_name="follower", on_delete=models.CASCADE)
     # prey will give me who is following me
-    prey = models.ForeignKey(User, related_name="prey", on_delete=models.CASCADE)
+    following = models.ForeignKey(User, related_name="following", on_delete=models.CASCADE)
 
-class Clue(models.Model):
+class Post(models.Model):
     message = models.CharField(max_length=255)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     timestamp = models.DateTimeField(auto_now_add=True)
@@ -16,6 +16,6 @@ class Clue(models.Model):
     class Meta:
         ordering = ['-timestamp']
 
-class Favorite(models.Model):
+class Like(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    clue = models.ForeignKey(Clue, on_delete=models.CASCADE, related_name="favorites")
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name="likes")
