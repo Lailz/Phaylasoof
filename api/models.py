@@ -2,16 +2,6 @@ from django.db import models
 from django.contrib.auth.models import User
 
 
-class Question(models.Model):
-    question_content = models.CharField(max_length=255)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    timestamp = models.DateTimeField(auto_now_add=True)
-    image = models.ImageField(null=True)
-
-    class Meta:
-        ordering = ['-timestamp']
-
-
 class Category(models.Model):
     category_title = models.CharField(max_length=255)
     category_description = models.TextField(null=True)
@@ -20,6 +10,28 @@ class Category(models.Model):
     image = models.ImageField(null=True)
     class Meta:
         ordering = ['-timestamp']
+
+class Question(models.Model):
+    question_content = models.CharField(max_length=255)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    timestamp = models.DateTimeField(auto_now_add=True)
+    image = models.ImageField(null=True)
+    category = models.ForeignKey(Category, on_delete=models.CASCADE)
+
+    class Meta:
+        ordering = ['-timestamp']
+
+class Answer(models.Model):
+    answer_content = models.CharField(max_length=500)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    timestamp = models.DateTimeField(auto_now_add=True)
+    image = models.ImageField(null=True)
+    question = models.ForeignKey(Question, on_delete=models.CASCADE)
+
+    class Meta:
+        ordering = ['-timestamp']
+
+
 
 class Upvote(models.Model):
 	user = models.ForeignKey(User, on_delete=models.CASCADE)
