@@ -7,7 +7,7 @@
 {% block content %}
 <div class="jumbotron text-center">
   <div class="container">
-    <h1 class="display-4">Your following Feed 😉</h1>
+    <h1 class="display-4">Your following Feed 2😉</h1>
     <p class="lead">Phaylasoof.com</p>
   </div>
 </div>
@@ -21,7 +21,7 @@
               <b>{{post.user}}: </b> {{post.message}} <span class="blockquote-footer">{{post.timestamp}}</span>
             </div>
             <div class="float-right">
-              <i id="star-{{post.id}}" class="fas fa-thumbs-up fa-spin {% if post.id in likes %}text-warning{% endif %}" onclick="like_me({{post.id}})"></i>
+              <i id="thumbsUp-{{post.id}}" class="fas fa-thumbs-up fa-spin {% if post.id in likes %}text-info{% endif %}" onclick="like_me({{post.id}})"></i>
             </div>
           </li>
         {% endfor %}
@@ -41,11 +41,11 @@
                     console.log('error');
                 },
                 success: function(data){
-                    let star_id = "#star-"+id;
+                    let thumbsUp_id = "#thumbsUp-"+id;
                     if(data.action==="like"){
-                        $(star_id).addClass("text-warning");
+                        $(thumbsUp_id).addClass("text-info");
                     }else{
-                        $(star_id).removeClass("text-warning")
+                        $(thumbsUp_id).removeClass("text-info")
                     }
                 },
             }
