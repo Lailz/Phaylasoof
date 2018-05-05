@@ -6,23 +6,23 @@ from rest_framework.generics import (
 	DestroyAPIView,
 	RetrieveUpdateAPIView
 	)
-from .models import Question, Category, Upvote, Downvote, Answer
+from .models import Question, Category, Upvote, Downvote, Answer, FollowCategory, FollowUser
 from .serializers import (
     CategoryListSerializer,
-    CategoryDetailSerializer,
 	QuestionListSerializer,
-	QuestionDetailSerializer,
 	AnswerListSerializer,
-	AnswerDetailSerializer,
     UpvoteCreateSerializer,
     UpvoteListSerializer,
     DownvoteCreateSerializer,
     DownvoteListSerializer,
     RegisterUserSerializer,
-    UserLoginSerializer
+    UserLoginSerializer,
+	FollowCategoryCreateSerializer,
+    FollowCategoryListSerializer,
+	FollowUserCreateSerializer,
+    FollowUserListSerializer,
     )
 from rest_framework.permissions import AllowAny, IsAuthenticated, IsAdminUser
-from .permissions import IsAuthorOrStaff
 from django.contrib.auth.models import User
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -52,7 +52,6 @@ class UserRegisterView(CreateAPIView):
 	permission_classes = [AllowAny]
 
 
-
 class CategoryListView(APIView):
 	permission_classes = [AllowAny,]
 
@@ -61,12 +60,6 @@ class CategoryListView(APIView):
 		categories = CategoryListSerializer(category_list, many=True, context={'request':request}).data
 		return Response(categories)
 
-# class CategoryDetailView(RetrieveAPIView):
-# 	queryset = Category.objects.all()
-# 	serializer_class = CategoryDetailSerializer
-# 	lookup_field = 'id'
-# 	lookup_url_kwarg = 'category_id'
-# 	permission_classes = [AllowAny,]
 
 class QuestionListView(APIView):
 	permission_classes = [AllowAny,]
@@ -76,13 +69,6 @@ class QuestionListView(APIView):
 		questions = QuestionListSerializer(question_list, many=True, context={'request':request}).data
 		return Response(questions)
 
-# class QuestionDetailView(RetrieveAPIView):
-# 	queryset = Question.objects.all()
-# 	serializer_class = QuestionDetailSerializer
-# 	lookup_field = 'id'
-# 	lookup_url_kwarg = 'question_id'
-# 	permission_classes = [AllowAny,]
-#
 class AnswerListView(APIView):
 	permission_classes = [AllowAny,]
 	def get(self, request, question_id):
@@ -90,27 +76,37 @@ class AnswerListView(APIView):
 		answers = AnswerListSerializer(answer_list, many=True).data
 		return Response(answers)
 
-# class AnswerDetailView(RetrieveAPIView):
-# 	queryset = Answer.objects.all()
-# 	serializer_class = AnswerDetailSerializer
-# 	lookup_field = 'id'
-# 	lookup_url_kwarg = 'answer_id'
-# 	permission_classes = [AllowAny,]
-#
-#
-# class UpvoteCreateView(CreateAPIView):
-# 	queryset = Upvote.objects.all()
-# 	serializer_class = UpvoteCreateSerializer
-# 	permission_classes = [IsAuthenticated,]
-#
-# 	def perform_create(self,serializer):
-# 		serializer.save(user=self.request.user)
-#
-#
-# class DownvoteCreateView(CreateAPIView):
-# 	queryset = Downvote.objects.all()
-# 	serializer_class = DownvoteCreateSerializer
-# 	permission_classes = [IsAuthenticated,]
-#
-# 	def perform_create(self,serializer):
-# 		serializer.save(user=self.request.user)
+
+
+class UpvoteCreateView(CreateAPIView):
+	queryset = Upvote.objects.all()
+	serializer_class = UpvoteCreateSerializer
+	permission_classes = [IsAuthenticated,]
+
+	def perform_create(self,serializer):
+		serializer.save(user=self.request.user)
+
+
+class DownvoteCreateView(CreateAPIView):
+	queryset = Downvote.objects.all()
+	serializer_class = DownvoteCreateSerializer
+	permission_classes = [IsAuthenticated,]
+
+	def perform_create(self,serializer):
+		serializer.save(user=self.request.user)
+
+class FollowCategoryCreateView(CreateAPIView):
+	queryset = FollowCategory.objects.all()
+	serializer_class = FollowCategoryCreateSerializer
+	permission_classes = [IsAuthenticated,]
+
+	def perform_create(self,serializer):
+		serializer.save(user=self.request.user)
+
+class FollowUserCreateView(CreateAPIView):
+	queryset = FollowUser.objects.all()
+	serializer_class = FollowUserCreateSerializer
+	permission_classes = [IsAuthenticated,]
+
+	def perform_create(self,serializer):
+		serializer.save(user=self.request.user)
