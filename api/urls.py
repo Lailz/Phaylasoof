@@ -9,6 +9,7 @@ from api.views import (
     UserRegisterView,
     LoginAPIView,
     FollowCategoryCreateView,
+    FollowQuestionCreateView,
     FollowUserCreateView
     )
 
@@ -18,8 +19,9 @@ urlpatterns = [
     path('answer_list/<int:question_id>/', AnswerListView.as_view(), name='api-answer_list'),
     path('register/', UserRegisterView.as_view(), name='api-register'),
     path('login/', LoginAPIView.as_view(), name='api-login'),
-    path('question_list/<int:category_id>/follow-category/', FollowCategoryCreateView.as_view(), name='api-follow-category'),
-    path('follow-user/<int:user_id>/follow-user/', FollowUserCreateView.as_view(), name='api-follow-user'),
+    path('follow-category/', FollowCategoryCreateView.as_view(), name='api-follow-category'),
+    path('follow-question/', FollowQuestionCreateView.as_view(), name='api-follow-question'),
+    path('follow-user/', FollowUserCreateView.as_view(), name='api-follow-user'),
     path('answer_list/<int:question_id>/upvote/', UpvoteCreateView.as_view(), name='api-upvote-question'),
     path('answer_list/<int:question_id>/downvote/', DownvoteCreateView.as_view(), name='api-downvote-question'),
 ]

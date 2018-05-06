@@ -1,5 +1,14 @@
 from rest_framework import serializers
-from .models import Question, Category, Answer, FollowCategory, Upvote, Downvote, FollowUser
+from .models import (
+    Question,
+    Category,
+    Answer,
+    FollowCategory,
+    FollowQuestion,
+    FollowUser,
+    Upvote,
+    Downvote
+)
 from django.contrib.auth.models import User
 from rest_framework_jwt.settings import api_settings
 
@@ -53,16 +62,20 @@ class RegisterUserSerializer(serializers.ModelSerializer):
 
 
 
-
 class CategoryListSerializer(serializers.ModelSerializer):
     questions = serializers.HyperlinkedIdentityField(
     view_name = "api-question_list",
     lookup_field = "id",
     lookup_url_kwarg = "category_id"
     )
+    followers = serializers.HyperlinkedIdentityField(
+    view_name = "api-follow-category",
+    lookup_field = "id",
+    lookup_url_kwarg = "category_id"
+    )
     class Meta:
         model = Category
-        fields = ['id', 'category_title', 'category_description', 'image', 'questions']
+        fields = ['id', 'category_title', 'category_description', 'image', 'questions', 'followers']
 
 
 class QuestionListSerializer(serializers.ModelSerializer):
@@ -104,6 +117,18 @@ class FollowCategoryListSerializer(serializers.ModelSerializer):
 
 	class Meta:
 		model = FollowCategory
+		fields = ['user']
+
+class FollowQuestionCreateSerializer(serializers.ModelSerializer):
+	class Meta:
+		model = FollowQuestion
+		fields = ['question']
+
+class FollowQuestionListSerializer(serializers.ModelSerializer):
+	user = UserSerializer()
+
+	class Meta:
+		model = FollowQuestion
 		fields = ['user']
 
 class FollowUserCreateSerializer(serializers.ModelSerializer):

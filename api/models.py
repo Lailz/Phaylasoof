@@ -2,6 +2,12 @@ from django.db import models
 from django.contrib.auth.models import User
 
 
+class UserProfile(models.Model):
+	user = models.OneToOneField(User , on_delete=models.CASCADE)
+	user_pic = models.ImageField()
+	user_biography = models.TextField(max_length=300, null=True)
+
+
 class Category(models.Model):
     category_title = models.CharField(max_length=255)
     category_description = models.TextField(null=True)
@@ -45,6 +51,15 @@ class FollowCategory(models.Model):
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
     follower = models.ForeignKey(User, on_delete=models.CASCADE)
 
+class FollowQuestion(models.Model):
+    question = models.ForeignKey(Question, on_delete=models.CASCADE)
+    follower = models.ForeignKey(User, on_delete=models.CASCADE)
+
+class FollowUser(models.Model):
+    #  will give me who I'm following
+    follower = models.ForeignKey(User, related_name="followers", on_delete=models.CASCADE)
+    #  will give me who is following me
+    following = models.ForeignKey(User, related_name="followings", on_delete=models.CASCADE)
 
 class Upvote(models.Model):
 	user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -53,9 +68,3 @@ class Upvote(models.Model):
 class Downvote(models.Model):
 	user = models.ForeignKey(User, on_delete=models.CASCADE)
 	question = models.ForeignKey(Question, on_delete=models.CASCADE)
-
-class FollowUser(models.Model):
-    #  will give me who I'm following
-    follower = models.ForeignKey(User, related_name="followers", on_delete=models.CASCADE)
-    #  will give me who is following me
-    following = models.ForeignKey(User, related_name="followings", on_delete=models.CASCADE)

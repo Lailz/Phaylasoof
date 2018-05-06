@@ -6,7 +6,7 @@ from rest_framework.generics import (
 	DestroyAPIView,
 	RetrieveUpdateAPIView
 	)
-from .models import Question, Category, Upvote, Downvote, Answer, FollowCategory, FollowUser
+from .models import Question, Category, Upvote, Downvote, Answer, FollowCategory, FollowUser, FollowQuestion
 from .serializers import (
     CategoryListSerializer,
 	QuestionListSerializer,
@@ -21,6 +21,8 @@ from .serializers import (
     FollowCategoryListSerializer,
 	FollowUserCreateSerializer,
     FollowUserListSerializer,
+	FollowQuestionCreateSerializer,
+	FollowQuestionListSerializer
     )
 from rest_framework.permissions import AllowAny, IsAuthenticated, IsAdminUser
 from django.contrib.auth.models import User
@@ -101,7 +103,15 @@ class FollowCategoryCreateView(CreateAPIView):
 	permission_classes = [IsAuthenticated,]
 
 	def perform_create(self,serializer):
-		serializer.save(user=self.request.user)
+		serializer.save(follower=self.request.user)
+
+class FollowQuestionCreateView(CreateAPIView):
+	queryset = FollowQuestion.objects.all()
+	serializer_class = FollowQuestionCreateSerializer
+	permission_classes = [IsAuthenticated,]
+
+	def perform_create(self,serializer):
+		serializer.save(follower=self.request.user)
 
 class FollowUserCreateView(CreateAPIView):
 	queryset = FollowUser.objects.all()
@@ -109,4 +119,4 @@ class FollowUserCreateView(CreateAPIView):
 	permission_classes = [IsAuthenticated,]
 
 	def perform_create(self,serializer):
-		serializer.save(user=self.request.user)
+		serializer.save(following=self.request.user)
