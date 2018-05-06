@@ -69,7 +69,7 @@ class CategoryListSerializer(serializers.ModelSerializer):
     lookup_url_kwarg = "category_id"
     )
     followers = serializers.HyperlinkedIdentityField(
-    view_name = "api-follow-category",
+    view_name = "api-follow-category_list",
     lookup_field = "id",
     lookup_url_kwarg = "category_id"
     )
@@ -128,6 +128,16 @@ class FollowCategoryListSerializer(serializers.ModelSerializer):
 	class Meta:
 		model = FollowCategory
 		fields = ['user']
+
+class FollowCategoryListSerializer(serializers.ModelSerializer):
+    followers = serializers.HyperlinkedIdentityField(
+    view_name = "api-follow-category_list",
+    lookup_field = "id",
+    lookup_url_kwarg = "category_id"
+    )
+    class Meta:
+        model = FollowCategory
+        fields = ['id', 'category', 'followers']
 
 class FollowQuestionCreateSerializer(serializers.ModelSerializer):
 	class Meta:

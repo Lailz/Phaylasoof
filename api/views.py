@@ -25,6 +25,7 @@ from .serializers import (
 	FollowQuestionListSerializer,
 	QuestionCreateSerializer,
 	AnswerCreateSerializer,
+	FollowCategoryListSerializer
 
     )
 from rest_framework.permissions import AllowAny, IsAuthenticated, IsAdminUser
@@ -139,6 +140,15 @@ class FollowCategoryCreateView(CreateAPIView):
 
 	def perform_create(self,serializer):
 		serializer.save(follower=self.request.user)
+
+class FollowCategoryListView(APIView):
+	permission_classes = [AllowAny,]
+
+	def get(self, request, category_id):
+		follower_list = FollowCategory.objects.filter(category__id=category_id)
+		followers = FollowCategoryListSerializer(follower_list, many=True, context={'request':request}).data
+		return Response(followers)
+
 
 class FollowQuestionCreateView(CreateAPIView):
 	queryset = FollowQuestion.objects.all()

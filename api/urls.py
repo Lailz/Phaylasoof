@@ -14,7 +14,8 @@ from api.views import (
     QuestionCreateView,
     QuestionDeleteView,
     AnswerCreateView,
-    AnswerDeleteView
+    AnswerDeleteView,
+    FollowCategoryListView,
     )
 
 urlpatterns = [
@@ -28,6 +29,7 @@ urlpatterns = [
     path('register/', UserRegisterView.as_view(), name='api-register'),
     path('login/', LoginAPIView.as_view(), name='api-login'),
     path('follow-category/', FollowCategoryCreateView.as_view(), name='api-follow-category'),
+    path('follow-category/list/<int:category_id>/', FollowCategoryListView.as_view(), name='api-follow-category_list'),
     path('follow-question/', FollowQuestionCreateView.as_view(), name='api-follow-question'),
     path('follow-user/', FollowUserCreateView.as_view(), name='api-follow-user'),
     path('answer_list/<int:question_id>/upvote/', UpvoteCreateView.as_view(), name='api-upvote-question'),
