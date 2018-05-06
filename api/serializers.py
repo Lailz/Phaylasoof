@@ -100,11 +100,21 @@ class QuestionListSerializer(serializers.ModelSerializer):
         json_downvotes = DownvoteListSerializer(downvotes, many=True).data
         return json_downvotes
 
+class QuestionCreateSerializer(serializers.ModelSerializer):
+	class Meta:
+		model = Question
+		fields = ['question_content','user','image', 'category']
+
 
 class AnswerListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Answer
         fields = ['id', 'answer_content', 'user', 'timestamp', 'image', 'question']
+
+class AnswerCreateSerializer(serializers.ModelSerializer):
+	class Meta:
+		model = Answer
+		fields = ['answer_content','user','image', 'question']
 
 
 class FollowCategoryCreateSerializer(serializers.ModelSerializer):

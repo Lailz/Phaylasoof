@@ -22,9 +22,13 @@ from .serializers import (
 	FollowUserCreateSerializer,
     FollowUserListSerializer,
 	FollowQuestionCreateSerializer,
-	FollowQuestionListSerializer
+	FollowQuestionListSerializer,
+	QuestionCreateSerializer,
+	AnswerCreateSerializer,
+
     )
 from rest_framework.permissions import AllowAny, IsAuthenticated, IsAdminUser
+from .permissions import IsAuthorOrStaff
 from django.contrib.auth.models import User
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -71,12 +75,43 @@ class QuestionListView(APIView):
 		questions = QuestionListSerializer(question_list, many=True, context={'request':request}).data
 		return Response(questions)
 
+class QuestionCreateView(CreateAPIView):
+	queryset = Question.objects.all()
+	serializer_class = QuestionCreateSerializer
+	permission_classes = [IsAuthenticated,]
+
+	def perform_create(self, serializer):
+		serializer.save(user=self.request.user)
+
+class QuestionDeleteView(DestroyAPIView):
+	queryset = Question.objects.all()
+	serializer_class = QuestionListSerializer
+	lookup_field = 'id'
+	lookup_url_kwarg = 'question_id'
+	permission_classes = [IsAuthenticated,IsAuthorOrStaff]
+
+
 class AnswerListView(APIView):
 	permission_classes = [AllowAny,]
 	def get(self, request, question_id):
 		answer_list = Answer.objects.filter(question__id=question_id)
 		answers = AnswerListSerializer(answer_list, many=True).data
 		return Response(answers)
+
+class AnswerCreateView(CreateAPIView):
+	queryset = Answer.objects.all()
+	serializer_class = AnswerCreateSerializer
+	permission_classes = [IsAuthenticated,]
+
+	def perform_create(self, serializer):
+		serializer.save(user=self.request.user)
+
+class AnswerDeleteView(DestroyAPIView):
+	queryset = Answer.objects.all()
+	serializer_class = AnswerListSerializer
+	lookup_field = 'id'
+	lookup_url_kwarg = 'answer_id'
+	permission_classes = [IsAuthenticated,IsAuthorOrStaff]
 
 
 
