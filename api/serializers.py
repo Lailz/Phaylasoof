@@ -40,19 +40,20 @@ class UserLoginSerializer(serializers.Serializer):
         token = jwt_encode_handler(payload)
 
         data["token"] = token
+
         return data
 
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['username', 'first_name', 'last_name', 'email']
+        fields = ['id', 'username', 'first_name', 'last_name', 'email']
 
 class RegisterUserSerializer(serializers.ModelSerializer):
     password = serializers.CharField(style={'input_type':'password'}, write_only=True)
     class Meta:
         model = User
-        fields = ['username', 'first_name', 'last_name', 'email', 'password']
+        fields = ['id', 'username', 'first_name', 'last_name', 'email', 'password']
 
         def create(self, validated_data):
             new_user = User(**validated_data)
@@ -69,7 +70,7 @@ class CategoryListSerializer(serializers.ModelSerializer):
     lookup_url_kwarg = "category_id"
     )
     followers = serializers.HyperlinkedIdentityField(
-    view_name = "api-follow-category_list",
+    view_name = "api-follow-category-list",
     lookup_field = "id",
     lookup_url_kwarg = "category_id"
     )
@@ -78,15 +79,22 @@ class CategoryListSerializer(serializers.ModelSerializer):
         fields = ['id', 'category_title', 'category_description', 'image', 'questions', 'followers']
 
 
+
+
 class QuestionListSerializer(serializers.ModelSerializer):
     answers = serializers.HyperlinkedIdentityField(
     view_name = "api-answer_list",
     lookup_field = "id",
     lookup_url_kwarg = "question_id"
     )
+    followers = serializers.HyperlinkedIdentityField(
+    view_name = "api-follow-question-list",
+    lookup_field = "id",
+    lookup_url_kwarg = "question_id"
+    )
     class Meta:
         model = Question
-        fields = ['id', 'question_content', 'user', 'timestamp', 'image', 'category', 'answers']
+        fields = ['id', 'question_content', 'user', 'timestamp', 'image', 'category', 'answers', 'followers']
 
     def get_upvotes(self, obj):
         # likes = Like.objects.filter(article=obj)
@@ -122,22 +130,18 @@ class FollowCategoryCreateSerializer(serializers.ModelSerializer):
 		model = FollowCategory
 		fields = ['category']
 
-class FollowCategoryListSerializer(serializers.ModelSerializer):
-	user = UserSerializer()
-
-	class Meta:
-		model = FollowCategory
-		fields = ['user']
 
 class FollowCategoryListSerializer(serializers.ModelSerializer):
-    followers = serializers.HyperlinkedIdentityField(
-    view_name = "api-follow-category_list",
-    lookup_field = "id",
-    lookup_url_kwarg = "category_id"
-    )
+    follower = UserSerializer()
     class Meta:
         model = FollowCategory
-        fields = ['id', 'category', 'followers']
+        fields = ['id', 'category', 'follower']
+
+    def get_follower(self, obj):
+        # likes = Like.objects.filter(article=obj)
+        follower = obj.followcategory_set.all()
+        json_follower = FollowCategoryListSerializer(follower, many=True).data
+        return json_follower
 
 class FollowQuestionCreateSerializer(serializers.ModelSerializer):
 	class Meta:
@@ -145,11 +149,11 @@ class FollowQuestionCreateSerializer(serializers.ModelSerializer):
 		fields = ['question']
 
 class FollowQuestionListSerializer(serializers.ModelSerializer):
-	user = UserSerializer()
+    follower = UserSerializer()
 
-	class Meta:
-		model = FollowQuestion
-		fields = ['user']
+    class Meta:
+        model = FollowQuestion
+        fields = ['id', 'question', 'follower']
 
 class FollowUserCreateSerializer(serializers.ModelSerializer):
 	class Meta:

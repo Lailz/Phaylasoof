@@ -51,15 +51,21 @@ class FollowCategory(models.Model):
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
     follower = models.ForeignKey(User, on_delete=models.CASCADE)
 
+
+
 class FollowQuestion(models.Model):
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
     follower = models.ForeignKey(User, on_delete=models.CASCADE)
+
+
 
 class FollowUser(models.Model):
     #  will give me who I'm following
     follower = models.ForeignKey(User, related_name="followers", on_delete=models.CASCADE)
     #  will give me who is following me
     following = models.ForeignKey(User, related_name="followings", on_delete=models.CASCADE)
+
+
 
 class Upvote(models.Model):
 	user = models.ForeignKey(User, on_delete=models.CASCADE)

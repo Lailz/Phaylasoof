@@ -25,7 +25,7 @@ from .serializers import (
 	FollowQuestionListSerializer,
 	QuestionCreateSerializer,
 	AnswerCreateSerializer,
-	FollowCategoryListSerializer
+
 
     )
 from rest_framework.permissions import AllowAny, IsAuthenticated, IsAdminUser
@@ -133,13 +133,20 @@ class DownvoteCreateView(CreateAPIView):
 	def perform_create(self,serializer):
 		serializer.save(user=self.request.user)
 
-class FollowCategoryCreateView(CreateAPIView):
-	queryset = FollowCategory.objects.all()
-	serializer_class = FollowCategoryCreateSerializer
-	permission_classes = [IsAuthenticated,]
 
-	def perform_create(self,serializer):
-		serializer.save(follower=self.request.user)
+class FollowCategoryCreateView(APIView):
+	def post(self, request):
+		my_data = request.data
+		my_serializer=FollowCategoryCreateSerializer(data=my_data)
+		if my_serializer.is_valid(raise_exception=True):
+			new_data = my_serializer.data
+			category_obj=Category.objects.get(id=new_data['category'])
+			category_follow, created = FollowCategory.objects.get_or_create(category=category_obj, follower=request.user)
+			if not created:
+				category_follow.delete()
+			return Response(new_data, status=HTTP_200_OK)
+		return Response(my_serializer.errors, status=HTTP_400_BAD_REQUEST)
+
 
 class FollowCategoryListView(APIView):
 	permission_classes = [AllowAny,]
@@ -150,13 +157,26 @@ class FollowCategoryListView(APIView):
 		return Response(followers)
 
 
-class FollowQuestionCreateView(CreateAPIView):
-	queryset = FollowQuestion.objects.all()
-	serializer_class = FollowQuestionCreateSerializer
-	permission_classes = [IsAuthenticated,]
+class FollowQuestionCreateView(APIView):
+	def post(self, request):
+		my_data = request.data
+		my_serializer=FollowQuestionCreateSerializer(data=my_data)
+		if my_serializer.is_valid(raise_exception=True):
+			new_data = my_serializer.data
+			question_obj=Question.objects.get(id=new_data['question'])
+			question_follow, created = FollowQuestion.objects.get_or_create(question=question_obj, follower=request.user)
+			if not created:
+				question_follow.delete()
+			return Response(new_data, status=HTTP_200_OK)
+		return Response(my_serializer.errors, status=HTTP_400_BAD_REQUEST)
 
-	def perform_create(self,serializer):
-		serializer.save(follower=self.request.user)
+class FollowQuestionListView(APIView):
+	permission_classes = [AllowAny,]
+
+	def get(self, request, question_id):
+		follower_list = FollowQuestion.objects.filter(question__id=question_id)
+		followers = FollowQuestionListSerializer(follower_list, many=True, context={'request':request}).data
+		return Response(followers)
 
 class FollowUserCreateView(CreateAPIView):
 	queryset = FollowUser.objects.all()
