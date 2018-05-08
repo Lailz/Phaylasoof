@@ -6,15 +6,19 @@ from rest_framework.generics import (
 	DestroyAPIView,
 	RetrieveUpdateAPIView
 	)
-from .models import Question, Category, Upvote, Downvote, Answer, FollowCategory, FollowUser, FollowQuestion
+from .models import Question, Category, UpvoteQuestion, DownvoteQuestion, UpvoteAnswer, DownvoteAnswer, Answer, FollowCategory, FollowUser, FollowQuestion
 from .serializers import (
     CategoryListSerializer,
 	QuestionListSerializer,
 	AnswerListSerializer,
-    UpvoteCreateSerializer,
-    UpvoteListSerializer,
-    DownvoteCreateSerializer,
-    DownvoteListSerializer,
+    UpvoteQuestionCreateSerializer,
+    UpvoteQuestionListSerializer,
+    DownvoteQuestionCreateSerializer,
+    DownvoteQuestionListSerializer,
+	UpvoteAnswerCreateSerializer,
+    UpvoteAnswerListSerializer,
+    DownvoteAnswerCreateSerializer,
+    DownvoteAnswerListSerializer,
     RegisterUserSerializer,
     UserLoginSerializer,
 	FollowCategoryCreateSerializer,
@@ -115,23 +119,92 @@ class AnswerDeleteView(DestroyAPIView):
 	permission_classes = [IsAuthenticated,IsAuthorOrStaff]
 
 
+class UpvoteQuestionCreateView(APIView):
+	def post(self, request):
+		my_data = request.data
+		my_serializer=UpvoteQuestionCreateSerializer(data=my_data)
+		if my_serializer.is_valid(raise_exception=True):
+			new_data = my_serializer.data
+			question_obj=Question.objects.get(id=new_data['question'])
+			upvote_question, created = UpvoteQuestion.objects.get_or_create(question=question_obj, user=request.user)
+			if not created:
+				upvote_question.delete()
+			return Response(new_data, status=HTTP_200_OK)
+		return Response(my_serializer.errors, status=HTTP_400_BAD_REQUEST)
 
-class UpvoteCreateView(CreateAPIView):
-	queryset = Upvote.objects.all()
-	serializer_class = UpvoteCreateSerializer
-	permission_classes = [IsAuthenticated,]
 
-	def perform_create(self,serializer):
-		serializer.save(user=self.request.user)
+class UpvoteQuestionListView(APIView):
+	permission_classes = [AllowAny,]
+
+	def get(self, request, question_id):
+		user_list = UpvoteQuestion.objects.filter(question__id=question_id)
+		users = UpvoteQuestionListSerializer(user_list, many=True, context={'request':request}).data
+		return Response(users)
+
+class DownvoteQuestionCreateView(APIView):
+	def post(self, request):
+		my_data = request.data
+		my_serializer=DownvoteQuestionCreateSerializer(data=my_data)
+		if my_serializer.is_valid(raise_exception=True):
+			new_data = my_serializer.data
+			question_obj=Question.objects.get(id=new_data['question'])
+			downvote_question, created = DownvoteQuestion.objects.get_or_create(question=question_obj, user=request.user)
+			if not created:
+				downvote_question.delete()
+			return Response(new_data, status=HTTP_200_OK)
+		return Response(my_serializer.errors, status=HTTP_400_BAD_REQUEST)
+
+class DownvoteQuestionListView(APIView):
+	permission_classes = [AllowAny,]
+
+	def get(self, request, question_id):
+		user_list = DownvoteQuestion.objects.filter(question__id=question_id)
+		users = DownvoteQuestionListSerializer(user_list, many=True, context={'request':request}).data
+		return Response(users)
+
+class UpvoteAnswerCreateView(APIView):
+	def post(self, request):
+		my_data = request.data
+		my_serializer=UpvoteAnswerCreateSerializer(data=my_data)
+		if my_serializer.is_valid(raise_exception=True):
+			new_data = my_serializer.data
+			answer_obj=Answer.objects.get(id=new_data['answer'])
+			upvote_answer, created = UpvoteAnswer.objects.get_or_create(answer=answer_obj, user=request.user)
+			if not created:
+				upvote_answer.delete()
+			return Response(new_data, status=HTTP_200_OK)
+		return Response(my_serializer.errors, status=HTTP_400_BAD_REQUEST)
 
 
-class DownvoteCreateView(CreateAPIView):
-	queryset = Downvote.objects.all()
-	serializer_class = DownvoteCreateSerializer
-	permission_classes = [IsAuthenticated,]
+class UpvoteAnswerListView(APIView):
+	permission_classes = [AllowAny,]
 
-	def perform_create(self,serializer):
-		serializer.save(user=self.request.user)
+	def get(self, request, answer_id):
+		user_list = UpvoteAnswer.objects.filter(answer__id=answer_id)
+		users = UpvoteAnswerListSerializer(user_list, many=True, context={'request':request}).data
+		return Response(users)
+
+class DownvoteAnswerCreateView(APIView):
+	def post(self, request):
+		my_data = request.data
+		my_serializer=DownvoteAnswerCreateSerializer(data=my_data)
+		if my_serializer.is_valid(raise_exception=True):
+			new_data = my_serializer.data
+			answer_obj=Answer.objects.get(id=new_data['answer'])
+			downvote_answer, created = DownvoteAnswer.objects.get_or_create(answer=answer_obj, user=request.user)
+			if not created:
+				downvote_answer.delete()
+			return Response(new_data, status=HTTP_200_OK)
+		return Response(my_serializer.errors, status=HTTP_400_BAD_REQUEST)
+
+class DownvoteAnswerListView(APIView):
+	permission_classes = [AllowAny,]
+
+	def get(self, request, answer_id):
+		user_list = DownvoteAnswer.objects.filter(answer__id=answer_id)
+		users = DownvoteAnswerListSerializer(user_list, many=True, context={'request':request}).data
+		return Response(users)
+
 
 
 class FollowCategoryCreateView(APIView):

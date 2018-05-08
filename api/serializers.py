@@ -6,8 +6,10 @@ from .models import (
     FollowCategory,
     FollowQuestion,
     FollowUser,
-    Upvote,
-    Downvote
+    UpvoteQuestion,
+    DownvoteQuestion,
+    UpvoteAnswer,
+    DownvoteAnswer
 )
 from django.contrib.auth.models import User
 from rest_framework_jwt.settings import api_settings
@@ -82,6 +84,8 @@ class CategoryListSerializer(serializers.ModelSerializer):
 
 
 class QuestionListSerializer(serializers.ModelSerializer):
+    upvotes = serializers.SerializerMethodField()
+    downvotes = serializers.SerializerMethodField()
     answers = serializers.HyperlinkedIdentityField(
     view_name = "api-answer_list",
     lookup_field = "id",
@@ -94,19 +98,14 @@ class QuestionListSerializer(serializers.ModelSerializer):
     )
     class Meta:
         model = Question
-        fields = ['id', 'question_content', 'user', 'timestamp', 'image', 'category', 'answers', 'followers']
+        fields = ['id', 'question_content', 'user', 'timestamp', 'image', 'category', 'answers', 'followers', 'upvotes', 'downvotes']
 
     def get_upvotes(self, obj):
-        # likes = Like.objects.filter(article=obj)
-        upvotes = obj.upvote_set.all()
-        json_upvotes = UpvoteListSerializer(upvotes, many=True).data
-        return json_upvotes
-
+        upvotes = obj.upvotequestion_set.all().count()
+        return upvotes
     def get_downvotes(self, obj):
-        # likes = Like.objects.filter(article=obj)
-        downvotes = obj.downvote_set.all()
-        json_downvotes = DownvoteListSerializer(downvotes, many=True).data
-        return json_downvotes
+        downvotes = obj.downvotequestion_set.all().count()
+        return downvotes
 
 class QuestionCreateSerializer(serializers.ModelSerializer):
 	class Meta:
@@ -115,9 +114,17 @@ class QuestionCreateSerializer(serializers.ModelSerializer):
 
 
 class AnswerListSerializer(serializers.ModelSerializer):
+    upvotes = serializers.SerializerMethodField()
+    downvotes = serializers.SerializerMethodField()
     class Meta:
         model = Answer
-        fields = ['id', 'answer_content', 'user', 'timestamp', 'image', 'question']
+        fields = ['id', 'answer_content', 'user', 'timestamp', 'image', 'question', 'upvotes', 'downvotes']
+    def get_upvotes(self, obj):
+        upvotes = obj.upvoteanswer_set.all().count()
+        return upvotes
+    def get_downvotes(self, obj):
+        downvotes = obj.downvoteanswer_set.all().count()
+        return downvotes
 
 class AnswerCreateSerializer(serializers.ModelSerializer):
 	class Meta:
@@ -136,12 +143,6 @@ class FollowCategoryListSerializer(serializers.ModelSerializer):
     class Meta:
         model = FollowCategory
         fields = ['id', 'category', 'follower']
-
-    def get_follower(self, obj):
-        # likes = Like.objects.filter(article=obj)
-        follower = obj.followcategory_set.all()
-        json_follower = FollowCategoryListSerializer(follower, many=True).data
-        return json_follower
 
 class FollowQuestionCreateSerializer(serializers.ModelSerializer):
 	class Meta:
@@ -167,26 +168,50 @@ class FollowUserListSerializer(serializers.ModelSerializer):
 		model = FollowUser
 		fields = ['following']
 
-class UpvoteCreateSerializer(serializers.ModelSerializer):
+class UpvoteQuestionCreateSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Upvote
+        model = UpvoteQuestion
         fields = ['question']
 
-class UpvoteListSerializer(serializers.ModelSerializer):
+class UpvoteQuestionListSerializer(serializers.ModelSerializer):
     user = UserSerializer()
 
     class Meta:
-        model = Upvote
-        fields = ['user']
+        model = UpvoteQuestion
+        fields = ['user', 'id', 'question']
 
-class DownvoteCreateSerializer(serializers.ModelSerializer):
+class DownvoteQuestionCreateSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Downvote
+        model = DownvoteQuestion
         fields = ['question']
 
-class DownvoteListSerializer(serializers.ModelSerializer):
+class DownvoteQuestionListSerializer(serializers.ModelSerializer):
     user = UserSerializer()
 
     class Meta:
-        model = Downvote
-        fields = ['user']
+        model = DownvoteQuestion
+        fields = ['user', 'id', 'question']
+
+class UpvoteAnswerCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UpvoteAnswer
+        fields = ['answer']
+
+class UpvoteAnswerListSerializer(serializers.ModelSerializer):
+    user = UserSerializer()
+
+    class Meta:
+        model = UpvoteAnswer
+        fields = ['user', 'id', 'answer']
+
+class DownvoteAnswerCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = DownvoteAnswer
+        fields = ['answer']
+
+class DownvoteAnswerListSerializer(serializers.ModelSerializer):
+    user = UserSerializer()
+
+    class Meta:
+        model = DownvoteAnswer
+        fields = ['user', 'id', 'answer']

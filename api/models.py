@@ -67,10 +67,18 @@ class FollowUser(models.Model):
 
 
 
-class Upvote(models.Model):
+class UpvoteQuestion(models.Model):
 	user = models.ForeignKey(User, on_delete=models.CASCADE)
 	question = models.ForeignKey(Question, on_delete=models.CASCADE)
 
-class Downvote(models.Model):
+class DownvoteQuestion(models.Model):
 	user = models.ForeignKey(User, on_delete=models.CASCADE)
 	question = models.ForeignKey(Question, on_delete=models.CASCADE)
+
+class UpvoteAnswer(models.Model):
+	user = models.ForeignKey(User, on_delete=models.CASCADE)
+	answer = models.ForeignKey(Answer, on_delete=models.CASCADE)
+
+class DownvoteAnswer(models.Model):
+	user = models.ForeignKey(User, on_delete=models.CASCADE)
+	answer = models.ForeignKey(Answer, on_delete=models.CASCADE)

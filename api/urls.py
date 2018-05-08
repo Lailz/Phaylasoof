@@ -2,21 +2,27 @@ from django.urls import path
 from api import views
 from api.views import (
     CategoryListView,
-    AnswerListView,
     QuestionListView,
-    UpvoteCreateView,
-    DownvoteCreateView,
+    QuestionCreateView,
+    QuestionDeleteView,
+    AnswerListView,
+    AnswerCreateView,
+    AnswerDeleteView,
+    UpvoteQuestionCreateView,
+    UpvoteQuestionListView,
+    DownvoteQuestionCreateView,
+    DownvoteQuestionListView,
+    UpvoteAnswerCreateView,
+    UpvoteAnswerListView,
+    DownvoteAnswerCreateView,
+    DownvoteAnswerListView,
     UserRegisterView,
     LoginAPIView,
     FollowCategoryCreateView,
-    FollowQuestionCreateView,
-    FollowUserCreateView,
-    QuestionCreateView,
-    QuestionDeleteView,
-    AnswerCreateView,
-    AnswerDeleteView,
     FollowCategoryListView,
-    FollowQuestionListView
+    FollowQuestionCreateView,
+    FollowQuestionListView,
+    FollowUserCreateView
     )
 
 urlpatterns = [
@@ -34,7 +40,14 @@ urlpatterns = [
     path('follow/question/', FollowQuestionCreateView.as_view(), name='api-follow-question'),
     path('follow/question/list/<int:question_id>/', FollowQuestionListView.as_view(), name='api-follow-question-list'),
     path('follow/user/', FollowUserCreateView.as_view(), name='api-follow-user'),
-    path('answer/list/<int:question_id>/upvote/', UpvoteCreateView.as_view(), name='api-upvote-question'),
-    path('answer/list/<int:question_id>/downvote/', DownvoteCreateView.as_view(), name='api-downvote-question'),
+    path('upvote/question/', UpvoteQuestionCreateView.as_view(), name='api-upvote-question'),
+    path('upvote/question/list/<int:question_id>/', UpvoteQuestionListView.as_view(), name='api-upvote-question-list'),
+    path('downvote/question/', DownvoteQuestionCreateView.as_view(), name='api-downvote-question'),
+    path('downvote/question/list/<int:question_id>/', DownvoteQuestionListView.as_view(), name='api-downvote-question-list'),
+    path('upvote/answer/', UpvoteAnswerCreateView.as_view(), name='api-upvote-answer'),
+    path('upvote/answer/list/<int:answer_id>/', UpvoteAnswerListView.as_view(), name='api-upvote-answer-list'),
+    path('downvote/answer/', DownvoteAnswerCreateView.as_view(), name='api-downvote-answer'),
+    path('downvote/answer/list/<int:answer_id>/', DownvoteAnswerListView.as_view(), name='api-downvote-answer-list'),
+
 
 ]
