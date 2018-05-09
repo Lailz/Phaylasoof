@@ -43,7 +43,7 @@ from django.urls import reverse
 from django.http import JsonResponse
 import json
 
-from rest_framework.filters import SearchFilter, OrderingFilter
+from django.db.models import Q
 
 class LoginAPIView(APIView):
 	permission_classes = [AllowAny]
@@ -68,7 +68,14 @@ class CategoryListView(APIView):
 
 	def get(self, request):
 		category_list = Category.objects.all()
-		categories = CategoryListSerializer(category_list, many=True, context={'request':request}).data
+		query = request.GET.get("search", None)
+		if query:
+			categories = category_list.filter(
+			Q(category_title__icontains=query)|
+			Q(category_description__icontains=query)).distinct()
+			categories = CategoryListSerializer(categories, many=True, context={'request':request}).data
+		else:
+			categories = CategoryListSerializer(category_list, many=True, context={'request':request}).data
 		return Response(categories)
 
 
@@ -77,7 +84,13 @@ class QuestionListView(APIView):
 
 	def get(self, request, category_id):
 		question_list = Question.objects.filter(category__id=category_id)
-		questions = QuestionListSerializer(question_list, many=True, context={'request':request}).data
+		query = request.GET.get("search", None)
+		if query:
+			questions = question_list.filter(
+			Q(question_content__icontains=query)).distinct()
+			questions = QuestionListSerializer(questions, many=True, context={'request':request}).data
+		else:
+			questions = QuestionListSerializer(question_list, many=True, context={'request':request}).data
 		return Response(questions)
 
 class QuestionCreateView(CreateAPIView):
@@ -98,9 +111,16 @@ class QuestionDeleteView(DestroyAPIView):
 
 class AnswerListView(APIView):
 	permission_classes = [AllowAny,]
+
 	def get(self, request, question_id):
 		answer_list = Answer.objects.filter(question__id=question_id)
-		answers = AnswerListSerializer(answer_list, many=True).data
+		query = request.GET.get("search", None)
+		if query:
+			answers = answer_list.filter(
+			Q(answer_content__icontains=query)).distinct()
+			answers = AnswerListSerializer(answers, many=True, context={'request':request}).data
+		else:
+			answers = AnswerListSerializer(answer_list, many=True, context={'request':request}).data
 		return Response(answers)
 
 class AnswerCreateView(CreateAPIView):

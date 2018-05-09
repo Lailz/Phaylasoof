@@ -66,6 +66,8 @@ class RegisterUserSerializer(serializers.ModelSerializer):
 
 
 class CategoryListSerializer(serializers.ModelSerializer):
+    followers_number = serializers.SerializerMethodField()
+    questions_number = serializers.SerializerMethodField()
     questions = serializers.HyperlinkedIdentityField(
     view_name = "api-question_list",
     lookup_field = "id",
@@ -78,14 +80,27 @@ class CategoryListSerializer(serializers.ModelSerializer):
     )
     class Meta:
         model = Category
-        fields = ['id', 'category_title', 'category_description', 'image', 'questions', 'followers']
+        fields = ['id', 'category_title', 'category_description', 'image', 'questions', 'followers', 'followers_number', 'questions_number']
+
+    def get_followers_number(self, obj):
+        followers_number = obj.followcategory_set.all().count()
+        return followers_number
+
+    def get_questions_number(self, obj):
+        questions_number = obj.question_set.all().count()
+        return questions_number
+
 
 
 
 
 class QuestionListSerializer(serializers.ModelSerializer):
+    user = UserSerializer()
+    category = CategoryListSerializer()
     upvotes = serializers.SerializerMethodField()
     downvotes = serializers.SerializerMethodField()
+    followers_number = serializers.SerializerMethodField()
+    answers_number = serializers.SerializerMethodField()
     answers = serializers.HyperlinkedIdentityField(
     view_name = "api-answer_list",
     lookup_field = "id",
@@ -98,7 +113,7 @@ class QuestionListSerializer(serializers.ModelSerializer):
     )
     class Meta:
         model = Question
-        fields = ['id', 'question_content', 'user', 'timestamp', 'image', 'category', 'answers', 'followers', 'upvotes', 'downvotes']
+        fields = ['id', 'question_content', 'user', 'timestamp', 'image', 'category', 'answers', 'followers', 'upvotes', 'downvotes', 'followers_number', 'answers_number']
 
     def get_upvotes(self, obj):
         upvotes = obj.upvotequestion_set.all().count()
@@ -107,6 +122,14 @@ class QuestionListSerializer(serializers.ModelSerializer):
         downvotes = obj.downvotequestion_set.all().count()
         return downvotes
 
+    def get_followers_number(self, obj):
+        followers_number = obj.followquestion_set.all().count()
+        return followers_number
+
+    def get_answers_number(self, obj):
+        answers_number = obj.answer_set.all().count()
+        return answers_number
+
 class QuestionCreateSerializer(serializers.ModelSerializer):
 	class Meta:
 		model = Question
@@ -114,6 +137,8 @@ class QuestionCreateSerializer(serializers.ModelSerializer):
 
 
 class AnswerListSerializer(serializers.ModelSerializer):
+    user = UserSerializer()
+    question = QuestionListSerializer()
     upvotes = serializers.SerializerMethodField()
     downvotes = serializers.SerializerMethodField()
     class Meta:
