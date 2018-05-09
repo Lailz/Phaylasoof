@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 
 
 class UserProfile(models.Model):
-	user = models.OneToOneField(User , on_delete=models.CASCADE)
+	user = models.ForeignKey(User , on_delete=models.CASCADE)
 	user_pic = models.ImageField()
 	user_biography = models.TextField(max_length=300, null=True)
 

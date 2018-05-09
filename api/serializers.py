@@ -9,10 +9,12 @@ from .models import (
     UpvoteQuestion,
     DownvoteQuestion,
     UpvoteAnswer,
-    DownvoteAnswer
+    DownvoteAnswer,
+    UserProfile
 )
 from django.contrib.auth.models import User
 from rest_framework_jwt.settings import api_settings
+
 
 class UserLoginSerializer(serializers.Serializer):
     username = serializers.CharField()
@@ -51,19 +53,55 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = ['id', 'username', 'first_name', 'last_name', 'email']
 
+
 class RegisterUserSerializer(serializers.ModelSerializer):
     password = serializers.CharField(style={'input_type':'password'}, write_only=True)
+    token = serializers.CharField(allow_blank=True, read_only=True)
     class Meta:
         model = User
-        fields = ['id', 'username', 'first_name', 'last_name', 'email', 'password']
+        fields = ['id', 'username', 'first_name', 'last_name', 'email', 'password', 'token']
 
-        def create(self, validated_data):
-            new_user = User(**validated_data)
-            new_user.set_password(validated_data['password'])
-            new_user.save()
-            return validated_data
+    def create(self, validated_data):
+        username = validated_data['username']
+        password = validated_data['password']
+        new_user = User(username=username)
+        new_user.set_password(password)
+        new_user.save()
+
+        jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
+        jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER
+
+        payload = jwt_payload_handler(new_user)
+        token = jwt_encode_handler(payload)
+
+        validated_data["token"] = token
+        return validated_data
 
 
+# class UserProfileSerializer(serializers.ModelSerializer):
+#     followers_number = serializers.SerializerMethodField()
+#     questions_number = serializers.SerializerMethodField()
+#     questions = serializers.HyperlinkedIdentityField(
+#     view_name = "api-question_list",
+#     lookup_field = "id",
+#     lookup_url_kwarg = "category_id"
+#     )
+#     followers = serializers.HyperlinkedIdentityField(
+#     view_name = "api-follow-user",
+#     lookup_field = "id",
+#     lookup_url_kwarg = "category_id"
+#     )
+#     class Meta:
+#         model = UserProfile
+#         fields = ['user', 'user_pic', 'user_biography', 'followers_number', 'questions_number', 'questions', 'followers' ]
+#
+#     def get_followers_number(self, obj):
+#         followers_number = obj.followuser_set.all().count()
+#         return followers_number
+#
+#     def get_questions_number(self, obj):
+#         questions_number = obj.question_set.all().count()
+#         return questions_number
 
 class CategoryListSerializer(serializers.ModelSerializer):
     followers_number = serializers.SerializerMethodField()

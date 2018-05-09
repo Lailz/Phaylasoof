@@ -22,7 +22,9 @@ from api.views import (
     FollowCategoryListView,
     FollowQuestionCreateView,
     FollowQuestionListView,
-    FollowUserCreateView
+    FollowUserCreateView,
+
+
     )
 
 urlpatterns = [
@@ -51,3 +53,8 @@ urlpatterns = [
 
 
 ]
+
+
+# path('userprofile/', UserProfileView.as_view(), name='api-user-profile'),
+# path('searchbox/', SearchBoxView.as_view(), name='api-search-box'),
+# path('allcontent/', AllContentListView.as_view(), name='api-all-content'),

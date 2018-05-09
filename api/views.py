@@ -6,7 +6,7 @@ from rest_framework.generics import (
 	DestroyAPIView,
 	RetrieveUpdateAPIView
 	)
-from .models import Question, Category, UpvoteQuestion, DownvoteQuestion, UpvoteAnswer, DownvoteAnswer, Answer, FollowCategory, FollowUser, FollowQuestion
+from .models import Question, Category, UpvoteQuestion, DownvoteQuestion, UpvoteAnswer, DownvoteAnswer, Answer, FollowCategory, FollowUser, FollowQuestion, UserProfile
 from .serializers import (
     CategoryListSerializer,
 	QuestionListSerializer,
@@ -31,6 +31,8 @@ from .serializers import (
 	AnswerCreateSerializer,
 
 
+
+
     )
 from rest_framework.permissions import AllowAny, IsAuthenticated, IsAdminUser
 from .permissions import IsAuthorOrStaff
@@ -44,6 +46,9 @@ from django.http import JsonResponse
 import json
 
 from django.db.models import Q
+from itertools import chain
+
+
 
 class LoginAPIView(APIView):
 	permission_classes = [AllowAny]
@@ -57,11 +62,96 @@ class LoginAPIView(APIView):
 			return Response(new_data, status=HTTP_200_OK)
 		return Response(my_serializer.errors, status=HTTP_400_BAD_REQUEST)
 
+
 class UserRegisterView(CreateAPIView):
 	queryset = User.objects.all()
 	serializer_class = RegisterUserSerializer
 	permission_classes = [AllowAny]
 
+# class AllContentListView(APIView):
+#     def get(self, request):
+#         categories = Category.objects.all()
+#         questions = Question.objects.all()
+#
+#         categories_list = list(categories)
+#         questions_list = list(questions)
+#
+#         combined = categories_list + questions_list
+#
+# 		MyCombinedSerializer = {
+# 		'cat': CategoryListSerializer,
+# 		'qus': QuestionListSerializer
+# 		}
+#
+#         serializer = MyCombinedSerializer(combined, many=True, context={'request':request}).data
+#
+#         return Response(serializer.data)
+
+
+# class SearchBoxView(APIView):
+# 	permission_classes = [AllowAny,]
+#
+# 	def get(self, request):
+# 		category_list = Category.objects.all()
+# 		question_list = Question.objects.all()
+# 		answer_list = Answer.objects.all()
+# 		all_content_list = chain(category_list, question_list, answer_list)
+# 		query = request.GET.get("search", None)
+#
+# 		# if query:
+# 		# 	all_content = all_content_list.filter(
+# 		# 	Q(category_title__icontains=query)|
+# 		# 	Q(category_description__icontains=query)|
+# 		# 	Q(question_content__icontains=query)|
+# 		# 	Q(answer_content__icontains=query)
+# 		# 	).distinct()
+# 		# 	all_content = CategoryListSerializer(all_content, many=True, context={'request':request}).data
+# 		# else:
+# 		# 	all_content = CategoryListSerializer(all_content_list, many=True, context={'request':request}).data
+#
+# 		if query:
+# 			contents = category_list.filter(
+# 			Q(category_title__icontains=query)|
+# 			Q(category_description__icontains=query)).distinct()
+# 			contents = CategoryListSerializer(contents, many=True, context={'request':request}).data
+# 		# else:
+# 		# 	contents = CategoryListSerializer(category_list, many=True, context={'request':request}).data
+#
+# 			if query:
+# 				contents = question_list.filter(
+# 				Q(question_content__icontains=query)).distinct()
+# 				contents = QuestionListSerializer(contents, many=True, context={'request':request}).data
+# 		# else:
+# 		# 	contents = QuestionListSerializer(question_list, many=True, context={'request':request}).data
+#
+# 				if query:
+# 					contents = answer_list.filter(
+# 					Q(answer_content__icontains=query)).distinct()
+# 					contents = AnswerListSerializer(contents, many=True, context={'request':request}).data
+# 		# else:
+# 		# 	contents = AnswerListSerializer(answer_list, many=True, context={'request':request}).data
+#
+# 		else:
+# 			contents = CategoryListSerializer(category_list, many=True, context={'request':request}).data
+#
+#
+# 		return Response(contents)
+
+
+# class UserProfileView(APIView):
+# 	permission_classes = [AllowAny,]
+#
+# 	def get(self, request):
+# 		user_list = UserProfile.objects.all()
+# 		query = request.GET.get("search", None)
+# 		if query:
+# 			users = user_list.filter(
+# 			Q(user__icontains=query)|
+# 			Q(user_biography__icontains=query)).distinct()
+# 			users = UserProfileSerializer(users, many=True, context={'request':request}).data
+# 		else:
+# 			users = UserProfileSerializer(user_list, many=True, context={'request':request}).data
+# 		return Response(users)
 
 class CategoryListView(APIView):
 	permission_classes = [AllowAny,]
