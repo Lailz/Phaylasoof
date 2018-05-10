@@ -10,7 +10,7 @@ from .models import (
     DownvoteQuestion,
     UpvoteAnswer,
     DownvoteAnswer,
-    UserProfile
+    Profile
 )
 from django.contrib.auth.models import User
 from rest_framework_jwt.settings import api_settings
@@ -49,6 +49,7 @@ class UserLoginSerializer(serializers.Serializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = User
         fields = ['id', 'username', 'first_name', 'last_name', 'email']
@@ -67,6 +68,8 @@ class RegisterUserSerializer(serializers.ModelSerializer):
         new_user = User(username=username)
         new_user.set_password(password)
         new_user.save()
+        new_profile = Profile(user=new_user)
+        new_profile.save()
 
         jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
         jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER
@@ -78,30 +81,42 @@ class RegisterUserSerializer(serializers.ModelSerializer):
         return validated_data
 
 
-# class UserProfileSerializer(serializers.ModelSerializer):
-#     followers_number = serializers.SerializerMethodField()
-#     questions_number = serializers.SerializerMethodField()
-#     questions = serializers.HyperlinkedIdentityField(
-#     view_name = "api-question_list",
-#     lookup_field = "id",
-#     lookup_url_kwarg = "category_id"
-#     )
-#     followers = serializers.HyperlinkedIdentityField(
-#     view_name = "api-follow-user",
-#     lookup_field = "id",
-#     lookup_url_kwarg = "category_id"
-#     )
-#     class Meta:
-#         model = UserProfile
-#         fields = ['user', 'user_pic', 'user_biography', 'followers_number', 'questions_number', 'questions', 'followers' ]
-#
-#     def get_followers_number(self, obj):
-#         followers_number = obj.followuser_set.all().count()
-#         return followers_number
-#
-#     def get_questions_number(self, obj):
-#         questions_number = obj.question_set.all().count()
-#         return questions_number
+class ProfileSerializer(serializers.ModelSerializer):
+    user_id = serializers.SerializerMethodField()
+    followers_number = serializers.SerializerMethodField()
+    followings_number = serializers.SerializerMethodField()
+    first_name = serializers.SerializerMethodField()
+    last_name = serializers.SerializerMethodField()
+    email = serializers.SerializerMethodField()
+    followers = serializers.HyperlinkedIdentityField(
+    view_name = "api-follow-user-list",
+    lookup_field = "user_id",
+    lookup_url_kwarg = "follower_id"
+    )
+    class Meta:
+        model = Profile
+        fields = ['id', 'user_id', 'user', 'image', 'biography', 'followers', 'followers_number', 'followings_number', 'first_name', 'last_name', 'email' ]
+
+    def get_user_id(self, obj):
+        user_id = obj.user.id
+        return user_id
+    def get_followers_number(self, obj):
+        followers_number = obj.user.followers.all().count()
+        return followers_number
+    def get_followings_number(self, obj):
+        followings_number = obj.user.followings.all().count()
+        return followings_number
+    def get_first_name(self, obj):
+        first_name = obj.user.first_name
+        return first_name
+    def get_last_name(self, obj):
+        last_name = obj.user.last_name
+        return last_name
+    def get_email(self, obj):
+        email = obj.user.email
+        return email
+    
+
 
 class CategoryListSerializer(serializers.ModelSerializer):
     followers_number = serializers.SerializerMethodField()
@@ -225,7 +240,7 @@ class FollowUserCreateSerializer(serializers.ModelSerializer):
 		fields = ['follower']
 
 class FollowUserListSerializer(serializers.ModelSerializer):
-	user = UserSerializer()
+	following = UserSerializer()
 
 	class Meta:
 		model = FollowUser

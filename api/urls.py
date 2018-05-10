@@ -23,7 +23,9 @@ from api.views import (
     FollowQuestionCreateView,
     FollowQuestionListView,
     FollowUserCreateView,
-
+    ProfileView,
+    FollowUserCreateView,
+    FollowUserListView,
 
     )
 
@@ -42,6 +44,7 @@ urlpatterns = [
     path('follow/question/', FollowQuestionCreateView.as_view(), name='api-follow-question'),
     path('follow/question/list/<int:question_id>/', FollowQuestionListView.as_view(), name='api-follow-question-list'),
     path('follow/user/', FollowUserCreateView.as_view(), name='api-follow-user'),
+    path('follow/user/list/<int:follower_id>/', FollowUserListView.as_view(), name='api-follow-user-list'),
     path('upvote/question/', UpvoteQuestionCreateView.as_view(), name='api-upvote-question'),
     path('upvote/question/list/<int:question_id>/', UpvoteQuestionListView.as_view(), name='api-upvote-question-list'),
     path('downvote/question/', DownvoteQuestionCreateView.as_view(), name='api-downvote-question'),
@@ -50,11 +53,8 @@ urlpatterns = [
     path('upvote/answer/list/<int:answer_id>/', UpvoteAnswerListView.as_view(), name='api-upvote-answer-list'),
     path('downvote/answer/', DownvoteAnswerCreateView.as_view(), name='api-downvote-answer'),
     path('downvote/answer/list/<int:answer_id>/', DownvoteAnswerListView.as_view(), name='api-downvote-answer-list'),
+    path('profile/<int:user_id>/', ProfileView.as_view(), name='api-profile'),
+
 
 
 ]
-
-
-# path('userprofile/', UserProfileView.as_view(), name='api-user-profile'),
-# path('searchbox/', SearchBoxView.as_view(), name='api-search-box'),
-# path('allcontent/', AllContentListView.as_view(), name='api-all-content'),
