@@ -25,7 +25,10 @@ from api.views import (
     FollowUserCreateView,
     ProfileView,
     FollowUserCreateView,
-    FollowUserListView,
+    FollowerUserListView,
+    FollowingUserListView,
+    FeedPageView,
+    UserListView
 
     )
 
@@ -44,7 +47,8 @@ urlpatterns = [
     path('follow/question/', FollowQuestionCreateView.as_view(), name='api-follow-question'),
     path('follow/question/list/<int:question_id>/', FollowQuestionListView.as_view(), name='api-follow-question-list'),
     path('follow/user/', FollowUserCreateView.as_view(), name='api-follow-user'),
-    path('follow/user/list/<int:follower_id>/', FollowUserListView.as_view(), name='api-follow-user-list'),
+    path('followers/user/list/<int:following_id>/', FollowerUserListView.as_view(), name='api-follower-user-list'),
+    path('followings/user/list/<int:follower_id>/', FollowingUserListView.as_view(), name='api-following-user-list'),
     path('upvote/question/', UpvoteQuestionCreateView.as_view(), name='api-upvote-question'),
     path('upvote/question/list/<int:question_id>/', UpvoteQuestionListView.as_view(), name='api-upvote-question-list'),
     path('downvote/question/', DownvoteQuestionCreateView.as_view(), name='api-downvote-question'),
@@ -54,6 +58,10 @@ urlpatterns = [
     path('downvote/answer/', DownvoteAnswerCreateView.as_view(), name='api-downvote-answer'),
     path('downvote/answer/list/<int:answer_id>/', DownvoteAnswerListView.as_view(), name='api-downvote-answer-list'),
     path('profile/<int:user_id>/', ProfileView.as_view(), name='api-profile'),
+    path('feedpage/<int:user_id>/', FeedPageView.as_view(), name='api-feedpage'),
+    path('user/list/', UserListView.as_view(), name='api-user_list'),
+
+
 
 
 

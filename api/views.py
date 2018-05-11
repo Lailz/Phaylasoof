@@ -6,7 +6,20 @@ from rest_framework.generics import (
 	DestroyAPIView,
 	RetrieveUpdateAPIView
 	)
-from .models import Question, Category, UpvoteQuestion, DownvoteQuestion, UpvoteAnswer, DownvoteAnswer, Answer, FollowCategory, FollowUser, FollowQuestion, Profile
+from .models import (
+	Question,
+	Category,
+	UpvoteQuestion,
+	DownvoteQuestion,
+	UpvoteAnswer,
+	DownvoteAnswer,
+	Answer,
+	FollowCategory,
+	FollowUser,
+	FollowQuestion,
+	Profile,
+	FeedPage
+)
 from .serializers import (
     CategoryListSerializer,
 	QuestionListSerializer,
@@ -21,19 +34,18 @@ from .serializers import (
     DownvoteAnswerListSerializer,
     RegisterUserSerializer,
     UserLoginSerializer,
+	UserSerializer,
 	FollowCategoryCreateSerializer,
     FollowCategoryListSerializer,
 	FollowUserCreateSerializer,
-    FollowUserListSerializer,
+    FollowerUserListSerializer,
+	FollowingUserListSerializer,
 	FollowQuestionCreateSerializer,
 	FollowQuestionListSerializer,
 	QuestionCreateSerializer,
 	AnswerCreateSerializer,
-	ProfileSerializer
-
-
-
-
+	ProfileSerializer,
+	FeedPageSerializer
     )
 from rest_framework.permissions import AllowAny, IsAuthenticated, IsAdminUser
 from .permissions import IsAuthorOrStaff
@@ -69,13 +81,34 @@ class UserRegisterView(CreateAPIView):
 	serializer_class = RegisterUserSerializer
 	permission_classes = [AllowAny]
 
+class UserListView(APIView):
+	permission_classes = [AllowAny,]
+
+	def get(self, request):
+		user_list = User.objects.all()
+		query = request.GET.get("search", None)
+		if query:
+			users = user_list.filter(
+			Q(username__icontains=query)).distinct()
+			users = UserSerializer(users, many=True, context={'request':request}).data
+		else:
+			users = UserSerializer(user_list, many=True, context={'request':request}).data
+		return Response(users)
+
 
 class ProfileView(APIView):
 	permission_classes = [AllowAny,]
 	def get(self, request, user_id):
 		get_profile = Profile.objects.get(user__id=user_id)
-		profiles = ProfileSerializer(get_profile, context={'request':request}).data
-		return Response(profiles)
+		profile = ProfileSerializer(get_profile, context={'request':request}).data
+		return Response(profile)
+
+class FeedPageView(APIView):
+	permission_classes = [AllowAny,]
+	def get(self, request, user_id):
+		get_feedpage = FeedPage.objects.get(user__id=user_id)
+		feedpage = FeedPageSerializer(get_feedpage, context={'request':request}).data
+		return Response(feedpage)
 
 
 class CategoryListView(APIView):
@@ -292,15 +325,21 @@ class FollowUserCreateView(CreateAPIView):
 	permission_classes = [IsAuthenticated,]
 
 	def perform_create(self,serializer):
-		serializer.save(following=self.request.user)
+		serializer.save(follower=self.request.user)
 
-class FollowUserListView(APIView):
+class FollowerUserListView(APIView):
+	permission_classes = [AllowAny,]
+
+	def get(self, request, following_id):
+		follower_list = FollowUser.objects.filter(following__id=following_id)
+		followers = FollowerUserListSerializer(follower_list, many=True, context={'request':request}).data
+		return Response(followers)
+
+class FollowingUserListView(APIView):
 	permission_classes = [AllowAny,]
 
 	def get(self, request, follower_id):
-		follower_list = FollowUser.objects.filter(follower__id=follower_id)
-		followers = FollowUserListSerializer(follower_list, many=True, context={'request':request}).data
-		print(follower_list)
-		print(follower_id)
+		following_list = FollowUser.objects.filter(follower__id=follower_id)
+		followings = FollowingUserListSerializer(following_list, many=True, context={'request':request}).data
 
-		return Response(followers)
+		return Response(followings)

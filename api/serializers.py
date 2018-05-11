@@ -10,7 +10,8 @@ from .models import (
     DownvoteQuestion,
     UpvoteAnswer,
     DownvoteAnswer,
-    Profile
+    Profile,
+    FeedPage
 )
 from django.contrib.auth.models import User
 from rest_framework_jwt.settings import api_settings
@@ -84,6 +85,7 @@ class RegisterUserSerializer(serializers.ModelSerializer):
         return validated_data
 
 
+
 class ProfileSerializer(serializers.ModelSerializer):
     user_id = serializers.SerializerMethodField()
     followers_number = serializers.SerializerMethodField()
@@ -92,22 +94,27 @@ class ProfileSerializer(serializers.ModelSerializer):
     last_name = serializers.SerializerMethodField()
     email = serializers.SerializerMethodField()
     followers = serializers.HyperlinkedIdentityField(
-    view_name = "api-follow-user-list",
+    view_name = "api-follower-user-list",
+    lookup_field = "user_id",
+    lookup_url_kwarg = "following_id"
+    )
+    followings = serializers.HyperlinkedIdentityField(
+    view_name = "api-following-user-list",
     lookup_field = "user_id",
     lookup_url_kwarg = "follower_id"
     )
     class Meta:
         model = Profile
-        fields = ['id', 'user_id', 'user', 'image', 'biography', 'followers', 'followers_number', 'followings_number', 'first_name', 'last_name', 'email' ]
+        fields = ['id', 'user_id', 'user', 'image', 'biography', 'followers', 'followings', 'followings_number', 'followers_number', 'first_name', 'last_name', 'email' ]
 
     def get_user_id(self, obj):
         user_id = obj.user.id
         return user_id
     def get_followers_number(self, obj):
-        followers_number = obj.user.followers.all().count()
+        followers_number = obj.user.followings.all().count()
         return followers_number
     def get_followings_number(self, obj):
-        followings_number = obj.user.followings.all().count()
+        followings_number = obj.user.followers.all().count()
         return followings_number
     def get_first_name(self, obj):
         first_name = obj.user.first_name
@@ -240,9 +247,16 @@ class FollowQuestionListSerializer(serializers.ModelSerializer):
 class FollowUserCreateSerializer(serializers.ModelSerializer):
 	class Meta:
 		model = FollowUser
+		fields = ['following']
+
+class FollowerUserListSerializer(serializers.ModelSerializer):
+	follower = UserSerializer()
+
+	class Meta:
+		model = FollowUser
 		fields = ['follower']
 
-class FollowUserListSerializer(serializers.ModelSerializer):
+class FollowingUserListSerializer(serializers.ModelSerializer):
 	following = UserSerializer()
 
 	class Meta:
@@ -296,3 +310,49 @@ class DownvoteAnswerListSerializer(serializers.ModelSerializer):
     class Meta:
         model = DownvoteAnswer
         fields = ['user', 'id', 'answer']
+
+class FeedPageSerializer(serializers.ModelSerializer):
+
+    user_id = serializers.SerializerMethodField()
+    first_name = serializers.SerializerMethodField()
+    last_name = serializers.SerializerMethodField()
+    email = serializers.SerializerMethodField()
+    followers = serializers.HyperlinkedIdentityField(
+    view_name = "api-follower-user-list",
+    lookup_field = "user_id",
+    lookup_url_kwarg = "following_id"
+    )
+    followings = serializers.HyperlinkedIdentityField(
+    view_name = "api-following-user-list",
+    lookup_field = "user_id",
+    lookup_url_kwarg = "follower_id"
+    )
+    class Meta:
+        model = FeedPage
+        fields = [
+            'id',
+            'user_id',
+            'user',
+            'followers',
+            'followings',
+            'first_name',
+            'last_name',
+            'email',
+            'followed_categories',
+            'followed_questions',
+            'followed_users',
+
+        ]
+
+    def get_user_id(self, obj):
+        user_id = obj.user.id
+        return user_id
+    def get_first_name(self, obj):
+        first_name = obj.user.first_name
+        return first_name
+    def get_last_name(self, obj):
+        last_name = obj.user.last_name
+        return last_name
+    def get_email(self, obj):
+        email = obj.user.email
+        return email
