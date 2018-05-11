@@ -74,6 +74,8 @@ class RegisterUserSerializer(serializers.ModelSerializer):
         new_user.save()
         new_profile = Profile(user=new_user)
         new_profile.save()
+        new_feedpage = FeedPage(user=new_user)
+        new_feedpage.save()
 
         jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
         jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER
@@ -228,9 +230,10 @@ class FollowCategoryCreateSerializer(serializers.ModelSerializer):
 
 class FollowCategoryListSerializer(serializers.ModelSerializer):
     follower = UserSerializer()
+    category = CategoryListSerializer()
     class Meta:
         model = FollowCategory
-        fields = ['id', 'category', 'follower']
+        fields = ['id', 'category', 'follower', 'category']
 
 class FollowQuestionCreateSerializer(serializers.ModelSerializer):
 	class Meta:
@@ -239,6 +242,7 @@ class FollowQuestionCreateSerializer(serializers.ModelSerializer):
 
 class FollowQuestionListSerializer(serializers.ModelSerializer):
     follower = UserSerializer()
+    question = QuestionListSerializer()
 
     class Meta:
         model = FollowQuestion
@@ -312,17 +316,26 @@ class DownvoteAnswerListSerializer(serializers.ModelSerializer):
         fields = ['user', 'id', 'answer']
 
 class FeedPageSerializer(serializers.ModelSerializer):
-
     user_id = serializers.SerializerMethodField()
     first_name = serializers.SerializerMethodField()
     last_name = serializers.SerializerMethodField()
     email = serializers.SerializerMethodField()
-    followers = serializers.HyperlinkedIdentityField(
+    link_to_followed_categories = serializers.HyperlinkedIdentityField(
+    view_name = "api-followed-categories-list",
+    lookup_field = "user_id",
+    lookup_url_kwarg = "follower_id"
+    )
+    link_to_followed_questions = serializers.HyperlinkedIdentityField(
+    view_name = "api-followed-questions-list",
+    lookup_field = "user_id",
+    lookup_url_kwarg = "follower_id"
+    )
+    link_to_followers = serializers.HyperlinkedIdentityField(
     view_name = "api-follower-user-list",
     lookup_field = "user_id",
     lookup_url_kwarg = "following_id"
     )
-    followings = serializers.HyperlinkedIdentityField(
+    link_to_followings = serializers.HyperlinkedIdentityField(
     view_name = "api-following-user-list",
     lookup_field = "user_id",
     lookup_url_kwarg = "follower_id"
@@ -333,15 +346,13 @@ class FeedPageSerializer(serializers.ModelSerializer):
             'id',
             'user_id',
             'user',
-            'followers',
-            'followings',
             'first_name',
             'last_name',
             'email',
-            'followed_categories',
-            'followed_questions',
-            'followed_users',
-
+            'link_to_followers',
+            'link_to_followings',
+            'link_to_followed_categories',
+            'link_to_followed_questions',
         ]
 
     def get_user_id(self, obj):

@@ -105,9 +105,5 @@ class DownvoteAnswer(models.Model):
 
 class FeedPage(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    followed_categories = models.ForeignKey(FollowCategory, on_delete=models.CASCADE)
-    followed_questions = models.ForeignKey(FollowQuestion, on_delete=models.CASCADE)
-    followed_users = models.ForeignKey(FollowUser, on_delete=models.CASCADE)
-
     def __str__(self):
         return 'FeedPage for user {}'.format(self.user.username)

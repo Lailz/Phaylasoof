@@ -108,6 +108,7 @@ class FeedPageView(APIView):
 	def get(self, request, user_id):
 		get_feedpage = FeedPage.objects.get(user__id=user_id)
 		feedpage = FeedPageSerializer(get_feedpage, context={'request':request}).data
+		print(feedpage)
 		return Response(feedpage)
 
 
@@ -297,6 +298,19 @@ class FollowCategoryListView(APIView):
 		followers = FollowCategoryListSerializer(follower_list, many=True, context={'request':request}).data
 		return Response(followers)
 
+class FollowedCategoriesListView(APIView):
+	permission_classes = [AllowAny,]
+
+	def get(self, request, follower_id):
+		category_list = FollowCategory.objects.filter(follower__id=follower_id)
+		query = request.GET.get("search", None)
+		if query:
+			categorys = category_list.filter(
+			Q(category_content__icontains=query)).distinct()
+			categorys = FollowCategoryListSerializer(categorys, many=True, context={'request':request}).data
+		else:
+			categorys = FollowCategoryListSerializer(category_list, many=True, context={'request':request}).data
+		return Response(categorys)
 
 class FollowQuestionCreateView(APIView):
 	def post(self, request):
@@ -318,6 +332,21 @@ class FollowQuestionListView(APIView):
 		follower_list = FollowQuestion.objects.filter(question__id=question_id)
 		followers = FollowQuestionListSerializer(follower_list, many=True, context={'request':request}).data
 		return Response(followers)
+
+class FollowedQuestionsListView(APIView):
+	permission_classes = [AllowAny,]
+
+	def get(self, request, follower_id):
+		question_list = FollowQuestion.objects.filter(follower__id=follower_id)
+		query = request.GET.get("search", None)
+		if query:
+			questions = question_list.filter(
+			Q(question_content__icontains=query)).distinct()
+			questions = FollowQuestionListSerializer(questions, many=True, context={'request':request}).data
+		else:
+			questions = FollowQuestionListSerializer(question_list, many=True, context={'request':request}).data
+		return Response(questions)
+
 
 class FollowUserCreateView(CreateAPIView):
 	queryset = FollowUser.objects.all()

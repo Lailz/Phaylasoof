@@ -28,7 +28,9 @@ from api.views import (
     FollowerUserListView,
     FollowingUserListView,
     FeedPageView,
-    UserListView
+    UserListView,
+    FollowedCategoriesListView,
+    FollowedQuestionsListView
 
     )
 
@@ -44,8 +46,10 @@ urlpatterns = [
     path('login/', LoginAPIView.as_view(), name='api-login'),
     path('follow/category/', FollowCategoryCreateView.as_view(), name='api-follow-category'),
     path('follow/category/list/<int:category_id>/', FollowCategoryListView.as_view(), name='api-follow-category-list'),
+    path('followed/categories/list/<int:follower_id>/', FollowedCategoriesListView.as_view(), name='api-followed-categories-list'),
     path('follow/question/', FollowQuestionCreateView.as_view(), name='api-follow-question'),
     path('follow/question/list/<int:question_id>/', FollowQuestionListView.as_view(), name='api-follow-question-list'),
+    path('followed/questions/list/<int:follower_id>/', FollowedQuestionsListView.as_view(), name='api-followed-questions-list'),
     path('follow/user/', FollowUserCreateView.as_view(), name='api-follow-user'),
     path('followers/user/list/<int:following_id>/', FollowerUserListView.as_view(), name='api-follower-user-list'),
     path('followings/user/list/<int:follower_id>/', FollowingUserListView.as_view(), name='api-following-user-list'),
