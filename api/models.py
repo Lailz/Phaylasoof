@@ -92,10 +92,10 @@ class DownvoteAnswer(models.Model):
     def __str__(self):
         return '{} downvotes {}'.format(self.user, self.answer)
 
-class FeedPage(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    def __str__(self):
-        return 'FeedPage for user {}'.format(self.user.username)
+# class FeedPage(models.Model):
+#     user = models.OneToOneField(User, on_delete=models.CASCADE)
+#     def __str__(self):
+#         return 'FeedPage for user {}'.format(self.user.username)
 
 
 class Profile(models.Model):

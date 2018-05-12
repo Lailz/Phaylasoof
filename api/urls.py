@@ -27,7 +27,7 @@ from api.views import (
     FollowUserCreateView,
     FollowerUserListView,
     FollowingUserListView,
-    FeedPageView,
+    # FeedPageView,
     UserListView,
     FollowedCategoriesListView,
     FollowedQuestionsListView
@@ -62,7 +62,6 @@ urlpatterns = [
     path('downvote/answer/', DownvoteAnswerCreateView.as_view(), name='api-downvote-answer'),
     path('downvote/answer/list/<int:answer_id>/', DownvoteAnswerListView.as_view(), name='api-downvote-answer-list'),
     path('profile/<int:user_id>/', ProfileView.as_view(), name='api-profile'),
-    path('feedpage/<int:user_id>/', FeedPageView.as_view(), name='api-feedpage'),
     path('user/list/', UserListView.as_view(), name='api-user_list'),
 
 
@@ -70,3 +69,5 @@ urlpatterns = [
 
 
 ]
+
+# path('feedpage/<int:user_id>/', FeedPageView.as_view(), name='api-feedpage'),

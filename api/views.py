@@ -18,7 +18,7 @@ from .models import (
 	FollowUser,
 	FollowQuestion,
 	Profile,
-	FeedPage
+	# FeedPage
 )
 from .serializers import (
     CategoryListSerializer,
@@ -45,7 +45,7 @@ from .serializers import (
 	QuestionCreateSerializer,
 	AnswerCreateSerializer,
 	ProfileSerializer,
-	FeedPageSerializer
+	# FeedPageSerializer
     )
 from rest_framework.permissions import AllowAny, IsAuthenticated, IsAdminUser
 from .permissions import IsAuthorOrStaff
@@ -103,13 +103,13 @@ class ProfileView(APIView):
 		profile = ProfileSerializer(get_profile, context={'request':request}).data
 		return Response(profile)
 
-class FeedPageView(APIView):
-	permission_classes = [AllowAny,]
-	def get(self, request, user_id):
-		get_feedpage = FeedPage.objects.get(user__id=user_id)
-		feedpage = FeedPageSerializer(get_feedpage, context={'request':request}).data
-		print(feedpage)
-		return Response(feedpage)
+# class FeedPageView(APIView):
+# 	permission_classes = [AllowAny,]
+# 	def get(self, request, user_id):
+# 		get_feedpage = FeedPage.objects.get(user__id=user_id)
+# 		feedpage = FeedPageSerializer(get_feedpage, context={'request':request}).data
+# 		print(feedpage)
+# 		return Response(feedpage)
 
 
 class CategoryListView(APIView):

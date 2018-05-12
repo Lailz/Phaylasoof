@@ -11,7 +11,7 @@ from .models import (
     UpvoteAnswer,
     DownvoteAnswer,
     Profile,
-    FeedPage
+    # FeedPage
 )
 from django.contrib.auth.models import User
 from rest_framework_jwt.settings import api_settings
@@ -74,8 +74,8 @@ class RegisterUserSerializer(serializers.ModelSerializer):
         new_user.save()
         new_profile = Profile(user=new_user)
         new_profile.save()
-        new_feedpage = FeedPage(user=new_user)
-        new_feedpage.save()
+        # new_feedpage = FeedPage(user=new_user)
+        # new_feedpage.save()
 
         jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
         jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER
@@ -267,59 +267,59 @@ class DownvoteAnswerListSerializer(serializers.ModelSerializer):
     class Meta:
         model = DownvoteAnswer
         fields = ['user', 'id', 'answer']
-
-class FeedPageSerializer(serializers.ModelSerializer):
-    user_id = serializers.SerializerMethodField()
-    first_name = serializers.SerializerMethodField()
-    last_name = serializers.SerializerMethodField()
-    email = serializers.SerializerMethodField()
-    link_to_followed_categories = serializers.HyperlinkedIdentityField(
-    view_name = "api-followed-categories-list",
-    lookup_field = "user_id",
-    lookup_url_kwarg = "follower_id"
-    )
-    link_to_followed_questions = serializers.HyperlinkedIdentityField(
-    view_name = "api-followed-questions-list",
-    lookup_field = "user_id",
-    lookup_url_kwarg = "follower_id"
-    )
-    link_to_followers = serializers.HyperlinkedIdentityField(
-    view_name = "api-follower-user-list",
-    lookup_field = "user_id",
-    lookup_url_kwarg = "following_id"
-    )
-    link_to_followings = serializers.HyperlinkedIdentityField(
-    view_name = "api-following-user-list",
-    lookup_field = "user_id",
-    lookup_url_kwarg = "follower_id"
-    )
-    class Meta:
-        model = FeedPage
-        fields = [
-            'id',
-            'user_id',
-            'user',
-            'first_name',
-            'last_name',
-            'email',
-            'link_to_followers',
-            'link_to_followings',
-            'link_to_followed_categories',
-            'link_to_followed_questions',
-        ]
-
-    def get_user_id(self, obj):
-        user_id = obj.user.id
-        return user_id
-    def get_first_name(self, obj):
-        first_name = obj.user.first_name
-        return first_name
-    def get_last_name(self, obj):
-        last_name = obj.user.last_name
-        return last_name
-    def get_email(self, obj):
-        email = obj.user.email
-        return email
+#
+# class FeedPageSerializer(serializers.ModelSerializer):
+#     user_id = serializers.SerializerMethodField()
+#     first_name = serializers.SerializerMethodField()
+#     last_name = serializers.SerializerMethodField()
+#     email = serializers.SerializerMethodField()
+#     link_to_followed_categories = serializers.HyperlinkedIdentityField(
+#     view_name = "api-followed-categories-list",
+#     lookup_field = "user_id",
+#     lookup_url_kwarg = "follower_id"
+#     )
+#     link_to_followed_questions = serializers.HyperlinkedIdentityField(
+#     view_name = "api-followed-questions-list",
+#     lookup_field = "user_id",
+#     lookup_url_kwarg = "follower_id"
+#     )
+#     link_to_followers = serializers.HyperlinkedIdentityField(
+#     view_name = "api-follower-user-list",
+#     lookup_field = "user_id",
+#     lookup_url_kwarg = "following_id"
+#     )
+#     link_to_followings = serializers.HyperlinkedIdentityField(
+#     view_name = "api-following-user-list",
+#     lookup_field = "user_id",
+#     lookup_url_kwarg = "follower_id"
+#     )
+#     class Meta:
+#         model = FeedPage
+#         fields = [
+#             'id',
+#             'user_id',
+#             'user',
+#             'first_name',
+#             'last_name',
+#             'email',
+#             'link_to_followers',
+#             'link_to_followings',
+#             'link_to_followed_categories',
+#             'link_to_followed_questions',
+#         ]
+#
+#     def get_user_id(self, obj):
+#         user_id = obj.user.id
+#         return user_id
+#     def get_first_name(self, obj):
+#         first_name = obj.user.first_name
+#         return first_name
+#     def get_last_name(self, obj):
+#         last_name = obj.user.last_name
+#         return last_name
+#     def get_email(self, obj):
+#         email = obj.user.email
+#         return email
 
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:

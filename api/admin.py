@@ -11,7 +11,7 @@ from .models import (
     FollowUser,
     Profile,
     FollowQuestion,
-    FeedPage
+    # FeedPage
 )
 
 admin.site.register(Category)
@@ -25,4 +25,4 @@ admin.site.register(FollowCategory)
 admin.site.register(FollowQuestion)
 admin.site.register(FollowUser)
 admin.site.register(Profile)
-admin.site.register(FeedPage)
+# admin.site.register(FeedPage)
