@@ -3,17 +3,6 @@ from django.contrib.auth.models import User
 
 
 
-
-class Profile(models.Model):
-	user = models.OneToOneField(User, on_delete=models.CASCADE)
-	image = models.ImageField(null=True)
-	dob = models.DateField(auto_now=False, auto_now_add=False, null=True)
-	biography = models.CharField(max_length=500)
-
-	def __str__(self):
-		return 'Profile for user {}'.format(self.user.username)
-
-
 class Category(models.Model):
     category_title = models.CharField(max_length=255)
     category_description = models.TextField(null=True)
@@ -107,3 +96,12 @@ class FeedPage(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     def __str__(self):
         return 'FeedPage for user {}'.format(self.user.username)
+
+
+class Profile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    image = models.ImageField(null=True)
+    dob = models.DateField(auto_now=False, auto_now_add=False, null=True)
+    biography = models.CharField(max_length=500)
+    def __str__(self):
+        return 'Profile for user {}'.format(self.user.username)

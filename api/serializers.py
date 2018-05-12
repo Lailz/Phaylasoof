@@ -87,49 +87,6 @@ class RegisterUserSerializer(serializers.ModelSerializer):
         return validated_data
 
 
-
-class ProfileSerializer(serializers.ModelSerializer):
-    user_id = serializers.SerializerMethodField()
-    followers_number = serializers.SerializerMethodField()
-    followings_number = serializers.SerializerMethodField()
-    first_name = serializers.SerializerMethodField()
-    last_name = serializers.SerializerMethodField()
-    email = serializers.SerializerMethodField()
-    followers = serializers.HyperlinkedIdentityField(
-    view_name = "api-follower-user-list",
-    lookup_field = "user_id",
-    lookup_url_kwarg = "following_id"
-    )
-    followings = serializers.HyperlinkedIdentityField(
-    view_name = "api-following-user-list",
-    lookup_field = "user_id",
-    lookup_url_kwarg = "follower_id"
-    )
-    class Meta:
-        model = Profile
-        fields = ['id', 'user_id', 'user', 'image', 'biography', 'followers', 'followings', 'followings_number', 'followers_number', 'first_name', 'last_name', 'email' ]
-
-    def get_user_id(self, obj):
-        user_id = obj.user.id
-        return user_id
-    def get_followers_number(self, obj):
-        followers_number = obj.user.followings.all().count()
-        return followers_number
-    def get_followings_number(self, obj):
-        followings_number = obj.user.followers.all().count()
-        return followings_number
-    def get_first_name(self, obj):
-        first_name = obj.user.first_name
-        return first_name
-    def get_last_name(self, obj):
-        last_name = obj.user.last_name
-        return last_name
-    def get_email(self, obj):
-        email = obj.user.email
-        return email
-
-
-
 class CategoryListSerializer(serializers.ModelSerializer):
     followers_number = serializers.SerializerMethodField()
     questions_number = serializers.SerializerMethodField()
@@ -154,10 +111,6 @@ class CategoryListSerializer(serializers.ModelSerializer):
     def get_questions_number(self, obj):
         questions_number = obj.question_set.all().count()
         return questions_number
-
-
-
-
 
 class QuestionListSerializer(serializers.ModelSerializer):
     user = UserSerializer()
@@ -367,3 +320,83 @@ class FeedPageSerializer(serializers.ModelSerializer):
     def get_email(self, obj):
         email = obj.user.email
         return email
+
+class CategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Category
+        fields = ['id', 'category_title']
+
+class QuestionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Question
+        fields = ['id', 'question_content']
+
+
+
+class ProfileSerializer(serializers.ModelSerializer):
+    user_id = serializers.SerializerMethodField()
+    followers_number = serializers.SerializerMethodField()
+    followings_number = serializers.SerializerMethodField()
+    first_name = serializers.SerializerMethodField()
+    last_name = serializers.SerializerMethodField()
+    email = serializers.SerializerMethodField()
+    username = serializers.SerializerMethodField()
+    followed_categories = serializers.SerializerMethodField()
+    followed_categories_ids = serializers.SerializerMethodField()
+    followed_questions = serializers.SerializerMethodField()
+    followed_questions_ids = serializers.SerializerMethodField()
+    followers = serializers.HyperlinkedIdentityField(
+    view_name = "api-follower-user-list",
+    lookup_field = "user_id",
+    lookup_url_kwarg = "following_id"
+    )
+    followings = serializers.HyperlinkedIdentityField(
+    view_name = "api-following-user-list",
+    lookup_field = "user_id",
+    lookup_url_kwarg = "follower_id"
+    )
+    class Meta:
+        model = Profile
+        fields = ['id', 'followed_categories', 'followed_categories_ids', 'followed_questions', 'followed_questions_ids', 'user_id', 'user', 'username', 'image', 'biography', 'followers', 'followings', 'followings_number', 'followers_number', 'first_name', 'last_name', 'email' ]
+
+    def get_user_id(self, obj):
+        user_id = obj.user.id
+        return user_id
+    def get_followers_number(self, obj):
+        followers_number = obj.user.followings.all().count()
+        return followers_number
+    def get_followings_number(self, obj):
+        followings_number = obj.user.followers.all().count()
+        return followings_number
+    def get_first_name(self, obj):
+        first_name = obj.user.first_name
+        return first_name
+    def get_last_name(self, obj):
+        last_name = obj.user.last_name
+        return last_name
+    def get_email(self, obj):
+        email = obj.user.email
+        return email
+    def get_username(self, obj):
+        username = obj.user.username
+        return username
+    def get_followed_categories(self, obj):
+        user = obj.user
+        followed_categories = user.followcategory_set.all().values_list('category', flat=True)
+        category_list = Category.objects.filter(id__in=followed_categories)
+        return CategorySerializer(category_list, many=True).data
+    def get_followed_questions(self, obj):
+        user = obj.user
+        followed_questions = user.followquestion_set.all().values_list('question', flat=True)
+        question_list = Question.objects.filter(id__in=followed_questions)
+        return QuestionSerializer(question_list, many=True).data
+
+    def get_followed_categories_ids(self, obj):
+        user = obj.user
+        followed_categories_ids = user.followcategory_set.all().values_list('category', flat=True)
+        return followed_categories_ids
+
+    def get_followed_questions_ids(self, obj):
+        user = obj.user
+        followed_questions_ids = user.followquestion_set.all().values_list('question', flat=True)
+        return followed_questions_ids
